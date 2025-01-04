@@ -2,6 +2,7 @@ package main
 
 import (
 	"archive/zip"
+	"crypto/md5"
 	"flag"
 	"fmt"
 	"io"
@@ -135,10 +136,35 @@ type IIndex struct {
 }
 
 func generateObjects(tempDir string) {
-	//	var indexFile []IIndex
+	var indexFile []IIndex
 
 	filepath.Walk(filepath.Join(tempDir, "assets", "minecraft"), func(path string, info os.FileInfo, err error) error {
-		fmt.Println(path, info.Size())
+		var fPath = strings.ReplaceAll(strings.ReplaceAll(path, tempDir, ""), "\\", "/")
+
+		if info.IsDir() {
+			return nil
+		}
+		file, err := os.Open(path)
+
+		if err != nil {
+			panic(err)
+		}
+
+		h := md5.New()
+		if _, err := io.Copy(h, file); err != nil {
+			panic(err)
+		}
+
+		hash := fmt.Sprintf("%x", h.Sum(nil))
+
+		indexFile = append(indexFile, IIndex{
+			Hash:     hash,
+			Path:     fPath,
+			Length:   info.Size(),
+			Versions: []string{},
+		})
 		return nil
 	})
+
+	fmt.Println(indexFile)
 }
