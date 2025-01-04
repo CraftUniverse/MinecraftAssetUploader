@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -204,10 +205,14 @@ func generateObjects(tempDir string) {
 }
 
 func uploadToS3(objectPath string) {
+	pathStyle, _ := strconv.ParseBool(os.Getenv("S3_PATH_STYLE"))
+
 	client := s3.New(s3.Options{
 		BaseEndpoint: aws.String(os.Getenv("S3_ENDPOINT")),
 		Region:       os.Getenv("S3_REGION"),
 		Credentials:  credentials.NewStaticCredentialsProvider(os.Getenv("S3_ACCESS_KEY"), os.Getenv("S3_SECRET_KEY"), ""),
+	}, func(o *s3.Options) {
+		o.UsePathStyle = pathStyle
 	})
 	uploader := manager.NewUploader(client)
 
