@@ -2,6 +2,7 @@ package main
 
 import (
 	"archive/zip"
+	"context"
 	"crypto/md5"
 	"flag"
 	"fmt"
@@ -11,6 +12,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/goccy/go-json"
 	"github.com/joho/godotenv"
 )
@@ -199,5 +204,28 @@ func generateObjects(tempDir string) {
 }
 
 func uploadToS3(objectPath string) {
+	client := s3.New(s3.Options{
+		BaseEndpoint: aws.String(os.Getenv("S3_ENDPOINT")),
+		Region:       os.Getenv("S3_REGION"),
+		Credentials:  credentials.NewStaticCredentialsProvider(os.Getenv("S3_ACCESS_KEY"), os.Getenv("S3_SECRET_KEY"), ""),
+	})
+	uploader := manager.NewUploader(client)
+
+	filepath.Walk(objectPath, func(path string, info os.FileInfo, err error) error {
+		file, err := os.Open(path)
+		if err != nil {
+			panic(err)
+		}
+
+		if _, err := uploader.Upload(context.Background(), &s3.PutObjectInput{
+			Bucket: aws.String(os.Getenv("S3_BUCKET")),
+			Key:    aws.String(os.Getenv("S3_PREFIX") + "/"),
+			Body:   file,
+		}); err != nil {
+			panic(err)
+		}
+
+		return nil
+	})
 
 }
