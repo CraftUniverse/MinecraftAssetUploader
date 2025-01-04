@@ -78,6 +78,14 @@ func main() {
 			continue
 		}
 
+		if fileParts[len(fileParts)-1] == "_list.json" ||
+			fileParts[len(fileParts)-1] == "sounds.json" ||
+			fileParts[len(fileParts)-1] == "_all.json" ||
+			fileParts[len(fileParts)-1] == "regional_compliancies.json" ||
+			fileParts[len(fileParts)-1] == "gpu_warnlist.json" {
+			continue
+		}
+
 		if !strings.HasPrefix(filePath, filepath.Clean(tempDir)+string(os.PathSeparator)) {
 			fmt.Println("invalid file path")
 			return
