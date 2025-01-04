@@ -39,6 +39,10 @@ func main() {
 
 	io.Copy(out, resp.Body)
 
+	unpackZip(tempDir)
+}
+
+func unpackZip(tempDir string) {
 	zipReader, err := zip.OpenReader(tempDir + ".zip")
 
 	if err != nil {
@@ -62,6 +66,8 @@ func main() {
 		}
 
 		if len(fileParts) >= 9 && fileParts[rootIndex+1] == "data" {
+			os.Remove(tempDir + ".zip")
+			generateObjects(tempDir)
 			break
 		}
 
@@ -119,6 +125,27 @@ func main() {
 		dstFile.Close()
 		fileInArchive.Close()
 	}
+}
 
-	os.Remove(tempDir + ".zip")
+type IIndex struct {
+	Hash     string   `json:"hash"`
+	Path     string   `json:"path"`
+	Length   int64    `json:"length"`
+	Versions []string `json:"versions"`
+}
+
+func generateObjects(tempDir string) {
+	var indexFile []IIndex
+
+	files, err := os.ReadDir(filepath.Join(tempDir, "assets", "minecraft"))
+
+	if err != nil {
+		panic(err)
+	}
+
+	for _, file := range files {
+		fmt.Println(file)
+
+		indexFile = append(indexFile, IIndex{})
+	}
 }
