@@ -49,12 +49,20 @@ func main() {
 
 	for _, file := range zipReader.File {
 		filePath := filepath.Join(tempDir, file.Name)
-		fileParts := strings.Split(filePath, "/")
+		fileParts := strings.Split(filePath, string(os.PathSeparator))
 
-		filePath = strings.ReplaceAll(filePath, fileParts[0]+"/", "")
+		var rootIndex = 0
 
-		if fileParts[0] == "data" {
-			return
+		for i, part := range fileParts {
+			if strings.HasPrefix(part, "InventivetalentDev-minecraft-assets") {
+				filePath = strings.ReplaceAll(filePath, part, "")
+				rootIndex = i
+				break
+			}
+		}
+
+		if len(fileParts) >= 9 && fileParts[rootIndex+1] == "data" {
+			break
 		}
 
 		if !strings.HasPrefix(filePath, filepath.Clean(tempDir)+string(os.PathSeparator)) {
