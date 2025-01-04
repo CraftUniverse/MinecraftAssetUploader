@@ -135,17 +135,10 @@ type IIndex struct {
 }
 
 func generateObjects(tempDir string) {
-	var indexFile []IIndex
+	//	var indexFile []IIndex
 
-	files, err := os.ReadDir(filepath.Join(tempDir, "assets", "minecraft"))
-
-	if err != nil {
-		panic(err)
-	}
-
-	for _, file := range files {
-		fmt.Println(file)
-
-		indexFile = append(indexFile, IIndex{})
-	}
+	filepath.Walk(filepath.Join(tempDir, "assets", "minecraft"), func(path string, info os.FileInfo, err error) error {
+		fmt.Println(path, info.Size())
+		return nil
+	})
 }
