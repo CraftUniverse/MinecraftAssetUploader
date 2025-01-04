@@ -47,6 +47,13 @@ func main() {
 
 	for _, file := range zipReader.File {
 		filePath := filepath.Join(tempDir, file.Name)
+		fileParts := strings.Split(filePath, "/")
+
+		filePath = strings.ReplaceAll(filePath, fileParts[0]+"/", "")
+
+		if fileParts[0] == "data" {
+			return
+		}
 
 		if !strings.HasPrefix(filePath, filepath.Clean(tempDir)+string(os.PathSeparator)) {
 			fmt.Println("invalid file path")
@@ -61,6 +68,8 @@ func main() {
 		if err := os.MkdirAll(filepath.Dir(filePath), os.ModePerm); err != nil {
 			panic(err)
 		}
+
+		fmt.Println(file.Name)
 
 		dstFile, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
 		if err != nil {
