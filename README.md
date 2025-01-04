@@ -1,0 +1,10 @@
+## Exmaple .env file:
+
+```
+S3_BUCKET=
+S3_PREFIX=
+S3_ENDPOINT=
+S3_REGION=
+S3_ACCESS_KEY=
+S3_SECRET_KEY=
+```
