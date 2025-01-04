@@ -161,6 +161,8 @@ func generateObjects(tempDir string) {
 		}
 		file, err := os.Open(path)
 
+		fileParts := strings.Split(fPath, string(os.PathSeparator))
+
 		if err != nil {
 			panic(err)
 		}
@@ -179,6 +181,8 @@ func generateObjects(tempDir string) {
 		fileContent, _ := os.ReadFile(path)
 
 		os.WriteFile(filepath.Join(basePath, hash), fileContent, 0644)
+
+		fmt.Println(fileParts[len(fileParts)-1] + " -> " + hash[0:2] + "/" + hash)
 
 		index = append(index, IIndex{
 			Hash:     hash,
@@ -236,7 +240,7 @@ func uploadToS3(objectPath string) {
 			fPath = pathParts[len(pathParts)-2] + "/" + pathParts[len(pathParts)-1]
 		}
 
-		fmt.Println(fPath)
+		fmt.Println("Uploading: " + fPath)
 
 		if _, err := uploader.Upload(context.Background(), &s3.PutObjectInput{
 			Bucket: aws.String(os.Getenv("S3_BUCKET")),
