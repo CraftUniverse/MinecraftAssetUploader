@@ -10,6 +10,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/goccy/go-json"
 )
 
 func main() {
@@ -136,7 +138,8 @@ type IIndex struct {
 }
 
 func generateObjects(tempDir string) {
-	var indexFile []IIndex
+	var index []IIndex
+	var objectPath = tempDir + "_objects"
 
 	filepath.Walk(filepath.Join(tempDir, "assets", "minecraft"), func(path string, info os.FileInfo, err error) error {
 		var fPath = strings.ReplaceAll(strings.ReplaceAll(path, tempDir, ""), "\\", "/")
@@ -157,7 +160,15 @@ func generateObjects(tempDir string) {
 
 		hash := fmt.Sprintf("%x", h.Sum(nil))
 
-		indexFile = append(indexFile, IIndex{
+		var basePath = filepath.Join(objectPath, hash[0:2])
+
+		os.MkdirAll(basePath, os.ModePerm)
+
+		fileContent, _ := os.ReadFile(path)
+
+		os.WriteFile(filepath.Join(basePath, hash), fileContent, 0644)
+
+		index = append(index, IIndex{
 			Hash:     hash,
 			Path:     fPath,
 			Length:   info.Size(),
@@ -166,5 +177,21 @@ func generateObjects(tempDir string) {
 		return nil
 	})
 
-	fmt.Println(indexFile)
+	jsonString, _ := json.Marshal(index)
+
+	indexFile, err := os.Create(filepath.Join(objectPath, "index.json"))
+
+	if err != nil {
+		panic(err)
+	}
+	defer indexFile.Close()
+
+	io.WriteString(indexFile, string(jsonString[:]))
+
+	//	os.Remove(tempDir)
+	uploadToS3(objectPath)
+}
+
+func uploadToS3(objectPath string) {
+
 }
