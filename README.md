@@ -9,13 +9,13 @@ This small Program Downloads Minecraft Assets from the [MCAsset Repo.](https://g
 ## Example .env file
 
 ```
-S3_BUCKET=
-S3_PREFIX=
-S3_ENDPOINT=
-S3_REGION=
-S3_ACCESS_KEY=
-S3_SECRET_KEY=
-S3_PATH_STYLE=
+S3_BUCKET=<bucket-name>
+S3_PREFIX=<key-prefix>
+S3_ENDPOINT=<endpoint>
+S3_REGION=<region>
+S3_ACCESS_KEY=<access-key>
+S3_SECRET_KEY=<secret-key>
+S3_PATH_STYLE=<true | false>
 ```
 
 ## Todo
