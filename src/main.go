@@ -19,6 +19,8 @@ func main() {
 	var tempDir = os.TempDir() + "/CEMCAU_" + *versionFlag
 	var dlURL = "https://github.com/InventivetalentDev/minecraft-assets/zipball/refs/heads/" + *versionFlag
 
+	fmt.Println("Dowloading from " + dlURL)
+
 	out, err := os.Create(tempDir + ".zip")
 
 	if err != nil {
