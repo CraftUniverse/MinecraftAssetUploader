@@ -65,6 +65,19 @@ func main() {
 			break
 		}
 
+		if len(fileParts) >= 11 && (fileParts[rootIndex+3] == "atlases" ||
+			fileParts[rootIndex+3] == "equipment" ||
+			fileParts[rootIndex+3] == "font" ||
+			fileParts[rootIndex+3] == "items" ||
+			fileParts[rootIndex+3] == "particles" ||
+			fileParts[rootIndex+3] == "post_effect" ||
+			fileParts[rootIndex+3] == "resourcepacks" ||
+			fileParts[rootIndex+3] == "shaders" ||
+			fileParts[rootIndex+3] == "sounds" ||
+			fileParts[rootIndex+3] == "texts") {
+			continue
+		}
+
 		if !strings.HasPrefix(filePath, filepath.Clean(tempDir)+string(os.PathSeparator)) {
 			fmt.Println("invalid file path")
 			return
