@@ -16,7 +16,7 @@ func main() {
 
 	flag.Parse()
 
-	var tempDir = os.TempDir() + "/CEMCAU_" + *versionFlag
+	var tempDir = filepath.Join(os.TempDir(), "/CEMCAU_"+*versionFlag)
 	var dlURL = "https://github.com/InventivetalentDev/minecraft-assets/zipball/refs/heads/" + *versionFlag
 
 	fmt.Println("Dowloading from " + dlURL)
