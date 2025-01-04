@@ -199,7 +199,7 @@ func generateObjects(tempDir string) {
 
 	io.WriteString(indexFile, string(jsonString[:]))
 
-	//	os.Remove(tempDir)
+	os.Remove(tempDir)
 	uploadToS3(objectPath)
 }
 
@@ -212,14 +212,30 @@ func uploadToS3(objectPath string) {
 	uploader := manager.NewUploader(client)
 
 	filepath.Walk(objectPath, func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+
+		pathParts := strings.Split(path, string(os.PathSeparator))
+
 		file, err := os.Open(path)
 		if err != nil {
 			panic(err)
 		}
 
+		var fPath string
+
+		if pathParts[len(pathParts)-1] == "index.json" {
+			fPath = "index.json"
+		} else {
+			fPath = pathParts[len(pathParts)-2] + "/" + pathParts[len(pathParts)-1]
+		}
+
+		fmt.Println(fPath)
+
 		if _, err := uploader.Upload(context.Background(), &s3.PutObjectInput{
 			Bucket: aws.String(os.Getenv("S3_BUCKET")),
-			Key:    aws.String(os.Getenv("S3_PREFIX") + "/"),
+			Key:    aws.String(os.Getenv("S3_PREFIX") + "/" + fPath),
 			Body:   file,
 		}); err != nil {
 			panic(err)
