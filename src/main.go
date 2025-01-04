@@ -88,4 +88,6 @@ func main() {
 		dstFile.Close()
 		fileInArchive.Close()
 	}
+
+	os.Remove(tempDir + ".zip")
 }
