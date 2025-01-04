@@ -35,13 +35,7 @@ func main() {
 
 	defer resp.Body.Close()
 
-	n, err := io.Copy(out, resp.Body)
-
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(n)
+	io.Copy(out, resp.Body)
 
 	zipReader, err := zip.OpenReader(tempDir + ".zip")
 
