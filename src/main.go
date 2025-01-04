@@ -12,15 +12,24 @@ import (
 	"strings"
 
 	"github.com/goccy/go-json"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		panic(err)
+	}
+
 	var versionFlag = flag.String("version", "1.21.4", "Minecraft Version")
 
 	flag.Parse()
 
 	var tempDir = filepath.Join(os.TempDir(), "/CEMCAU_"+*versionFlag)
 	var dlURL = "https://github.com/InventivetalentDev/minecraft-assets/zipball/refs/heads/" + *versionFlag
+
+	generateObjects(tempDir)
+	return
 
 	fmt.Println("Dowloading from " + dlURL)
 
