@@ -1,0 +1,38 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go Build
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.20'
+    - name: Get Dep.
+      run: go get .
+    - name: Build
+      run:  |
+        echo "windows" >> $GOOS
+        go build -ldflags="-s -w" -o dist/win/CEMCAU.exe src/main.go
+        echo "linux" >> $GOOS
+        go build -ldflags="-s -w" -o dist/linux/CEMCAU src/main.go
+    - name: Upload Linux Binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: Linux Binary
+        path: dist/linux/CEMCAU
+    - name: Upload Windows Binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: Windows Binary
+        path: dist/win/CEMCAU.exe
