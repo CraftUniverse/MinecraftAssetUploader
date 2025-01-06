@@ -284,12 +284,13 @@ func generateObjects(tempDir string) {
 
 	// Remove the temporary stuff
 	go os.Remove(tempDir + ".zip")
+	go os.RemoveAll(tempDir)
 
-	uploadToS3(objectPath, tempDir)
+	uploadToS3(objectPath)
 }
 
 // Uploads the generated objects to S3
-func uploadToS3(objectPath string, tempDir string) {
+func uploadToS3(objectPath string) {
 	uploader := manager.NewUploader(s3Client)
 
 	// Walk through the object directory and upload each file to S3
@@ -342,7 +343,4 @@ func uploadToS3(objectPath string, tempDir string) {
 
 		return nil
 	})
-
-	os.RemoveAll(objectPath)
-	os.RemoveAll(tempDir)
 }
