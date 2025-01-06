@@ -313,18 +313,20 @@ func uploadToS3(objectPath string, tempDir string) {
 			fPath = pathParts[len(pathParts)-2] + "/" + pathParts[len(pathParts)-1]
 		}
 
-		// Calculate the MD5 hash of the file
-		h := md5.New()
-		if _, err := io.Copy(h, file); err != nil {
-			panic(err)
-		}
+		if oldIndex != nil {
+			// Calculate the MD5 hash of the file
+			h := md5.New()
+			if _, err := io.Copy(h, file); err != nil {
+				panic(err)
+			}
 
-		hash := fmt.Sprintf("%x", h.Sum(nil))
+			hash := fmt.Sprintf("%x", h.Sum(nil))
 
-		for i := 0; i < len(oldIndex); i++ {
-			if oldIndex[i].Hash == hash {
-				fmt.Println("Skipping: " + fPath)
-				return nil
+			for i := 0; i < len(oldIndex); i++ {
+				if oldIndex[i].Hash == hash {
+					fmt.Println("Skipping: " + fPath)
+					return nil
+				}
 			}
 		}
 
