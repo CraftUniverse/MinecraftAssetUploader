@@ -104,7 +104,6 @@ func unpackZip(tempDir string) {
 			fileParts[rootIndex+3] == "post_effect" ||
 			fileParts[rootIndex+3] == "resourcepacks" ||
 			fileParts[rootIndex+3] == "shaders" ||
-			fileParts[rootIndex+3] == "sounds" ||
 			fileParts[rootIndex+3] == "texts") {
 			continue
 		}
