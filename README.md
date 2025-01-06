@@ -23,8 +23,6 @@ S3_PATH_STYLE=<true | false>
 - Configurable Filter
 - Additional Export to **.zip**
 - Additional Export to **.tar.gz**
-- Get already existing `index.json` and uploads just new files
-- Add Versions in the Same Object-Storage via the `index.json`
 
 # [License](/LICENSE)
 
