@@ -190,16 +190,13 @@ func generateObjects(tempDir string) {
 	var index []IIndex
 	var objectPath = tempDir + "_objects"
 
-	headOut, err := s3Client.HeadObject(s3Context, &s3.HeadObjectInput{
+	headOut, _ := s3Client.HeadObject(s3Context, &s3.HeadObjectInput{
 		Bucket: aws.String(os.Getenv("S3_BUCKET")),
 		Key:    aws.String(os.Getenv("S3_PREFIX") + "/index.json"),
 	})
-	if err != nil {
-		panic(err)
-	}
 
 	// Does nothing if the object does not exist
-	if *headOut.ContentLength != 0 {
+	if headOut != nil {
 		indexObject, err := s3Client.GetObject(s3Context, &s3.GetObjectInput{
 			Bucket: aws.String(os.Getenv("S3_BUCKET")),
 			Key:    aws.String(os.Getenv("S3_PREFIX") + "/index.json"),
