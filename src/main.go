@@ -285,8 +285,10 @@ func generateObjects(tempDir string) {
 
 	io.WriteString(indexFile, string(jsonString[:]))
 
-	// Remove the temporary directory
-	os.Remove(tempDir)
+	// Remove the temporary stuff
+	go os.RemoveAll(tempDir)
+	go os.Remove(tempDir + ".zip")
+
 	uploadToS3(objectPath)
 }
 
@@ -342,4 +344,6 @@ func uploadToS3(objectPath string) {
 
 		return nil
 	})
+
+	os.RemoveAll(objectPath)
 }
