@@ -302,9 +302,11 @@ func uploadToS3(objectPath string) {
 		pathParts := strings.Split(path, string(os.PathSeparator))
 
 		file, err := os.Open(path)
+
 		if err != nil {
 			panic(err)
 		}
+		defer file.Close()
 
 		var fPath string
 
