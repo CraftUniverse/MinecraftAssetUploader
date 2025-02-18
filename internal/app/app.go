@@ -1,92 +1,28 @@
-package main
+package app
 
 import (
 	"archive/zip"
 	"context"
 	"crypto/md5"
-	"flag"
 	"fmt"
 	"io"
-	"net/http"
 	"os"
 	"path/filepath"
 	"slices"
-	"strconv"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/goccy/go-json"
-	"github.com/joho/godotenv"
 )
 
-// Define a flag for the Minecraft version
-var versionFlag = flag.String("version", "1.21.4", "Minecraft Version")
-var s3Client *s3.Client
-var s3Context = context.Background()
-
-func main() {
-	// Load environment variables from .env file
-	err := godotenv.Load()
-	if err != nil {
-		panic(err)
-	}
-
-	// Parse command-line flags
-	flag.Parse()
-
-	// Retrieve the environment variable for S3_PATH_STYLE and parse it to a boolean
-	// This variable determines whether to use path-style or virtual-hosted-style URLs for S3 requests
-	pathStyle, _ := strconv.ParseBool(os.Getenv("S3_PATH_STYLE"))
-
-	// Create a new S3 client with specified options
-	s3Client = s3.New(s3.Options{
-		BaseEndpoint: aws.String(os.Getenv("S3_ENDPOINT")),
-		Region:       os.Getenv("S3_REGION"),
-		// Provide static credentials for accessing the S3 service, retrieved from environment variables
-		Credentials: credentials.NewStaticCredentialsProvider(
-			os.Getenv("S3_ACCESS_KEY"),
-			os.Getenv("S3_SECRET_KEY"),
-			""),
-	}, func(o *s3.Options) {
-		// Configure the client to use path-style URLs based on the parsed boolean value
-		o.UsePathStyle = pathStyle
-	})
-
-	// Create a temporary directory for the downloaded files
-	var tempDir = filepath.Join(os.TempDir(), "/CEMCAU_"+*versionFlag)
-	// Construct the download URL for the Minecraft assets
-	var dlURL = "https://github.com/InventivetalentDev/minecraft-assets/zipball/refs/heads/" + *versionFlag
-
-	fmt.Println("Dowloading from " + dlURL)
-
-	// Create a file to save the downloaded zip
-	out, err := os.Create(tempDir + ".zip")
-
-	if err != nil {
-		panic(err)
-	}
-	defer out.Close()
-
-	// Download the zip file
-	resp, err := http.Get(dlURL)
-
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-
-	// Copy the downloaded data to the file
-	io.Copy(out, resp.Body)
-
-	// Unpack the downloaded zip file
-	unpackZip(tempDir)
-}
+var VersionFlag string = "1.21.4"
+var S3Client *s3.Client
+var S3Context = context.Background()
 
 // Unpacks the zip file to the specified directory
-func unpackZip(tempDir string) {
+func UnpackZip(tempDir string) {
 	zipReader, err := zip.OpenReader(tempDir + ".zip")
 
 	if err != nil {
@@ -113,7 +49,7 @@ func unpackZip(tempDir string) {
 		// Skip certain directories and files
 		if len(fileParts) >= 9 && fileParts[rootIndex+1] == "data" {
 			os.Remove(tempDir + ".zip")
-			generateObjects(tempDir)
+			GenerateObjects(tempDir)
 			break
 		}
 
@@ -183,21 +119,21 @@ type IIndex struct {
 	Versions []string `json:"versions"`
 }
 
-var oldIndex []IIndex = nil
+var OldIndex []IIndex = nil
 
 // Generates the index file and objects
-func generateObjects(tempDir string) {
+func GenerateObjects(tempDir string) {
 	var index []IIndex
 	var objectPath = tempDir + "_objects"
 
-	headOut, _ := s3Client.HeadObject(s3Context, &s3.HeadObjectInput{
+	headOut, _ := S3Client.HeadObject(S3Context, &s3.HeadObjectInput{
 		Bucket: aws.String(os.Getenv("S3_BUCKET")),
 		Key:    aws.String(os.Getenv("S3_PREFIX") + "/index.json"),
 	})
 
 	// Does nothing if the object does not exist
 	if headOut != nil {
-		indexObject, err := s3Client.GetObject(s3Context, &s3.GetObjectInput{
+		indexObject, err := S3Client.GetObject(S3Context, &s3.GetObjectInput{
 			Bucket: aws.String(os.Getenv("S3_BUCKET")),
 			Key:    aws.String(os.Getenv("S3_PREFIX") + "/index.json"),
 		})
@@ -208,7 +144,7 @@ func generateObjects(tempDir string) {
 		defer indexObject.Body.Close()
 
 		// Read the existing index file
-		json.NewDecoder(indexObject.Body).Decode(&oldIndex)
+		json.NewDecoder(indexObject.Body).Decode(&OldIndex)
 	}
 
 	// Walk through the assets directory
@@ -244,16 +180,16 @@ func generateObjects(tempDir string) {
 
 		fmt.Println(fileParts[len(fileParts)-1] + " -> " + hash[0:2] + "/" + hash)
 
-		if oldIndex != nil {
-			for i := 0; i < len(oldIndex); i++ {
-				if oldIndex[i].Path == fPath && oldIndex[i].Hash == hash {
-					if !slices.Contains(oldIndex[i].Versions, *versionFlag) {
+		if OldIndex != nil {
+			for i := 0; i < len(OldIndex); i++ {
+				if OldIndex[i].Path == fPath && OldIndex[i].Hash == hash {
+					if !slices.Contains(OldIndex[i].Versions, VersionFlag) {
 						// Add the file to the index
 						index = append(index, IIndex{
 							Hash:     hash,
 							Path:     fPath,
 							Length:   info.Size(),
-							Versions: append(oldIndex[i].Versions, *versionFlag),
+							Versions: append(OldIndex[i].Versions, VersionFlag),
 						})
 					}
 					return nil
@@ -266,7 +202,7 @@ func generateObjects(tempDir string) {
 			Hash:     hash,
 			Path:     fPath,
 			Length:   info.Size(),
-			Versions: []string{*versionFlag},
+			Versions: []string{VersionFlag},
 		})
 		return nil
 	})
@@ -286,12 +222,12 @@ func generateObjects(tempDir string) {
 	go os.Remove(tempDir + ".zip")
 	go os.RemoveAll(tempDir)
 
-	uploadToS3(objectPath)
+	UploadToS3(objectPath)
 }
 
 // Uploads the generated objects to S3
-func uploadToS3(objectPath string) {
-	uploader := manager.NewUploader(s3Client)
+func UploadToS3(objectPath string) {
+	uploader := manager.NewUploader(S3Client)
 
 	// Walk through the object directory and upload each file to S3
 	filepath.Walk(objectPath, func(path string, info os.FileInfo, err error) error {
@@ -316,7 +252,7 @@ func uploadToS3(objectPath string) {
 			fPath = pathParts[len(pathParts)-2] + "/" + pathParts[len(pathParts)-1]
 		}
 
-		if oldIndex != nil {
+		if OldIndex != nil {
 			// Calculate the MD5 hash of the file
 			h := md5.New()
 			if _, err := io.Copy(h, file); err != nil {
@@ -325,8 +261,8 @@ func uploadToS3(objectPath string) {
 
 			hash := fmt.Sprintf("%x", h.Sum(nil))
 
-			for i := 0; i < len(oldIndex); i++ {
-				if oldIndex[i].Hash == hash {
+			for i := 0; i < len(OldIndex); i++ {
+				if OldIndex[i].Hash == hash {
 					fmt.Println("Skipping: " + fPath)
 					return nil
 				}
@@ -335,7 +271,7 @@ func uploadToS3(objectPath string) {
 
 		fmt.Println("Uploading: " + fPath)
 
-		if _, err := uploader.Upload(s3Context, &s3.PutObjectInput{
+		if _, err := uploader.Upload(S3Context, &s3.PutObjectInput{
 			Bucket: aws.String(os.Getenv("S3_BUCKET")),
 			Key:    aws.String(os.Getenv("S3_PREFIX") + "/" + fPath),
 			Body:   file,

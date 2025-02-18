@@ -2,9 +2,28 @@
 
 This small Program Downloads Minecraft Assets from the [MCAsset Repo.](https://github.com/InventivetalentDev/minecraft-assets), filters a couple of Assets then converts them into Objects and Upload them to an S3 Object-Storage
 
-## Usage
+### Table of Contents
 
-`./CENCAU --version=<minecraft-version>`
+- [CLI](#cli)
+- [Run](#run)
+- [Example .env file](#example-env-file)
+- [TODO](#todo)
+- [License](#license)
+- [Contributers](#contributers)
+
+## CLI
+
+```
+assetuploader
+    --version
+        Set's the minecraft version
+```
+
+## Run
+
+```bash
+go run cmd/assetuploader/main.go <arguments>
+```
 
 ## Example .env file
 
@@ -18,24 +37,16 @@ S3_SECRET_KEY=<secret-key>
 S3_PATH_STYLE=<true | false>
 ```
 
-## Todo
+## TODO
 
 - Configurable Filter
 - Additional Export to **.zip**
 - Additional Export to **.tar.gz**
 
-# [License](/LICENSE)
+## License
 
-Copyright 2025 RedCraft Studios
+[PolarLite](https://github.com/CraftUniverse/PolarLite) © 2025 by [CraftUniverse](https://github.com/CraftUniverse) is licensed under [Creative Commons Attribution-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+## Contributers
 
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+- [@Turboman3000](https://github.com/Turboman3000)
