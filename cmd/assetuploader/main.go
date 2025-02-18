@@ -17,12 +17,16 @@ import (
 	"net.craftengine/uploader/internal/app"
 )
 
+var version string
+
 // Define a flag for the Minecraft version
 var versionFlag = flag.String("version", "1.21.4", "Minecraft Version")
 var s3Client *s3.Client
 var s3Context = context.Background()
 
 func main() {
+	fmt.Println("Asset Uploader Version: " + version)
+
 	// Load environment variables from .env file
 	err := godotenv.Load()
 	if err != nil {
