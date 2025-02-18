@@ -1,4 +1,4 @@
-module net.craftengine/uploader
+module dev.craftengine.assetuploader
 
 go 1.23.0
 

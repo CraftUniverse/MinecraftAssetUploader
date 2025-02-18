@@ -10,11 +10,11 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"dev.craftengine.assetuploader/internal/app"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/joho/godotenv"
-	"net.craftengine/uploader/internal/app"
 )
 
 var version string
