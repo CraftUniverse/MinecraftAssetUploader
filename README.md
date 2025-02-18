@@ -45,7 +45,7 @@ S3_PATH_STYLE=<true | false>
 
 ## License
 
-[PolarLite](https://github.com/CraftUniverse/PolarLite) © 2025 by [CraftUniverse](https://github.com/CraftUniverse) is licensed under [Creative Commons Attribution-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)
+[AssetUploader](https://github.com/CraftUniverse/MinecraftAssetUploader) © 2025 by [CraftUniverse](https://github.com/CraftUniverse) is licensed under [Creative Commons Attribution-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)
 
 ## Contributers
 
